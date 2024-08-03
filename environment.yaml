@@ -1,5 +1,6 @@
 name: llmatic
 channels:
+  - conda-forge
   - defaults
 dependencies:
   - ca-certificates=2023.01.10=haa95532_0
