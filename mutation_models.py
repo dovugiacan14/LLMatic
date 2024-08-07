@@ -1,5 +1,5 @@
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM, CodeGenForCausalLM
+from transformers import AutoTokenizer, AutoModelForCausalLM, CodeGenForCausalLM, BitsAndBytesConfig
 #import openai
 import os
 import ray
@@ -7,6 +7,13 @@ import ray
 from conf.config import Config
 
 cfg = Config()
+
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_use_double_quant=True,
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_compute_dtype=torch.bfloat16
+)
 
 
 def codex_mutate(cfg: Config, prompt, model="code-davinci-002",temperature=0.5):
@@ -55,7 +62,7 @@ def codegen_mutate(cfg: Config, prompt, temperature):
         #     model = f'Salesforce/{cfg.MUTATION}'
 
         tokenizer = AutoTokenizer.from_pretrained(model)
-        model = AutoModelForCausalLM.from_pretrained(model, load_in_4bit=True).to(cfg.DEVICE)
+        model = AutoModelForCausalLM.from_pretrained(model, quantization_config=bnb_config).to(cfg.DEVICE)
 
         # TODO: Above lines may have downloaded a fresh model if it was not already present. Now, copy the model file 
         # to the desired location if necessary.
