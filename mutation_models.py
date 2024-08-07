@@ -46,7 +46,7 @@ def codegen_mutate(cfg: Config, prompt, temperature):
         #model.config.use_cache = True
         sample = model.generate(**inputs, temperature=0.5, max_length=len(inputs[0]) + 300)
         
-        return tokenizer.decode(sample[0][len(inputs[0]):])
+        return tokenizer.decode(sample[0][len(inputs[0]):], clean_up_tokenization_spaces=True)
     else:
         model = f'Salesforce/{cfg.MUTATION}'
         print('xx')
