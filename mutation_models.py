@@ -69,7 +69,7 @@ def codegen_mutate(cfg: Config, prompt, temperature):
 
         inputs = tokenizer(prompt, return_tensors="pt").to(cfg.DEVICE)
         sample = model.generate(**inputs, max_length=350 + len(inputs[0]),temperature=temperature,num_beams=1,do_sample=True)
-        return tokenizer.decode(sample[0][len(inputs[0]):], truncate_before_pattern=[r"\n\n^#", "^'''", "\n\n\n"])
+        return tokenizer.decode(sample[0][len(inputs[0]):], truncate_before_pattern=[r"\n\n^#", "^'''", "\n\n\n"], clean_up_tokenization_spaces=True)
 
 
 def replace_word_mutation(sentence):
