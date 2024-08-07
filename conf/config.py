@@ -23,7 +23,7 @@ class Config:
     NET_TRAINING_EPOCHS: int = 50
     TEMPERATURE: float = 0.0000000
 
-    DEVICE: str = "cuda" # options: ["cuda", "cpu", "both"]
+    DEVICE: str = "cuda:0" # options: ["cuda", "cpu", "both"]
 
     NUM_PROCESSES: int = mp.cpu_count() - 1
     RAY: bool = True
