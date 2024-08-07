@@ -19,7 +19,7 @@ class Config:
     MUTATION: str = "codegen-6B-mono"
     #MUTATION: str = "codex"
 
-    GENERATIONS: int = 200
+    GENERATIONS: int = 5
     NET_TRAINING_EPOCHS: int = 50
     TEMPERATURE: float = 0.0000000
 
