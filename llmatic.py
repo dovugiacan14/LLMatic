@@ -183,7 +183,7 @@ def main(cfg: Config):
     out_file = os.path.normpath(f"{path_nets}/exp_results.csv")        
     csv_writer(["generations", "best_loss", "used_prompt"],out_file)
             
-
+    
     for gen_i in range(init_gen, cfg.GENERATIONS):
 
         generated_nets = []
@@ -201,6 +201,7 @@ def main(cfg: Config):
                 for i in range(0, cfg.INIT_NUM_NETS):
                     print(f"Selected prompt for generations: {selected_prompts[i]}")
 
+                # generate code from prompt 
                 for prompt in selected_prompts:
                     generated_net_results.append(mutation_fn.remote(cfg=cfg, prompt=init_net + "\n" + prompt, temperature=temperature_start))
 
@@ -338,15 +339,16 @@ def main(cfg: Config):
             invalid_net = False
             generation, prompt, temperature = k
 
-            
+    
             net_path = os.path.normpath(f"{path_nets}/network_{gen_i}_{i}_{prompt[3:-3]}_{temperature}.py")
             
 
             if cfg.MUTATION == "codex":
                     extract_code_section(generation['choices'][0]["text"], prompt, file_path=net_path)
+            # write code into a file 
             elif cfg.MUTATION.startswith("codegen"):
                 extract_code_section(generation, prompt, file_path=net_path)  
-            main_net_focus = read_python_file(net_path)
+            main_net_focus = read_python_file(net_path) # read that file 
             print(f"Net in focus:\n {main_net_focus}")
 
             if not invalid_net:
@@ -361,8 +363,11 @@ def main(cfg: Config):
                     elif isinstance(curios_prompt,float) or isinstance(curios_prompt,int):
                         prompt = int_to_prompt[int(curios_prompt)]
                     
-                #breakpoint()
+                """
+                If Net is trainable, save path, save prompt and save net()
+                """
                 try:
+                    # check Net can be trained. 
                     is_t = is_trainable(net)
                 except Exception:
                     is_t = False
@@ -373,7 +378,7 @@ def main(cfg: Config):
                 else:
                     invalid_net = True
 
-                    
+            print(f"Number Net() can be trained: {len(training_nets)}")    
 
             if invalid_net:
                 print(f"The network at {net_path} is not trainable")
@@ -388,7 +393,7 @@ def main(cfg: Config):
             losses = []
             layers_c_net = detect_layers(curios_net)
             if cfg.DEVICE == "cpu":
-                
+                print(f"Transfer weights to CPU.!")
                 for net in training_nets:
                     for layer in layers_c_net:
                         try:
@@ -399,15 +404,16 @@ def main(cfg: Config):
                 for net in training_nets:
                     inter_results.append(forward_pass_on_gpu.remote(net))
             elif cfg.DEVICE == "cuda":
-                    for net in training_nets:
-                        for layer in layers_c_net:
-                            try:
-                                net = transfer_weights(curios_net,net,layer)
-                                print(f"Weights transferred successfully")
-                            except Exception:
-                                print("Weights can not transfer")
-                    for net in training_nets:
-                        inter_results.append(forward_pass_on_gpu.remote(net))
+                print(f"Transfer weights to CUDA.!")
+                for net in training_nets:
+                    for layer in layers_c_net:
+                        try:
+                            net = transfer_weights(curios_net,net,layer)
+                            print(f"Weights transferred successfully")
+                        except Exception:
+                            print("Weights can not transfer")
+                for net in training_nets:
+                    inter_results.append(forward_pass_on_gpu.remote(net))
             else:
                 raise ValueError(f"{cfg.DEVICE} is not a valid device")
             fitness = []
@@ -458,6 +464,7 @@ def main(cfg: Config):
                             inter_results.append(train_net_on_gpu.remote(net,cfg.NET_TRAINING_EPOCHS))
 
                 elif cfg.DEVICE == "cuda":
+                    print(f"Transfer weights to CUDA.!")
                     for net in training_nets:
                         for layer in layers_c_net:
                             try:

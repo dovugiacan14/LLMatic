@@ -10,7 +10,7 @@ class Config:
     """This class provides a "schema" for the config file, validating types."""
 
     RANDOM_INIT_NETS: int = 10 # INIT Nets to be accepted in archive
-    INIT_NUM_NETS: int = 10 # INIT Nets created per generation
+    INIT_NUM_NETS: int = 2 # INIT Nets created per generation
     ROLL_OUTS: int = 4 # For GPU training. ROLL_OUTS * (INIT_NUM_NETS or NUM_NETS) = Total nets created in each generation
     NUM_NETS: int = 10 # Mutation and crossover nets to be created
     START_FROM_CHECKPOINT: bool = False
@@ -23,7 +23,8 @@ class Config:
     NET_TRAINING_EPOCHS: int = 50
     TEMPERATURE: float = 0.0000000
 
-    DEVICE: str = "cuda:0" # options: ["cuda", "cpu", "both"]
+    #DEVICE: str = "cuda:0" # options: ["cuda", "cpu", "both"]
+    DEVICE: str = "cuda" # options: ["cuda", "cpu", "both"]
 
     NUM_PROCESSES: int = mp.cpu_count() - 1
     RAY: bool = True

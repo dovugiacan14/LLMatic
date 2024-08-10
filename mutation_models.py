@@ -49,7 +49,7 @@ def codegen_mutate(cfg: Config, prompt, temperature):
         return tokenizer.decode(sample[0][len(inputs[0]):], clean_up_tokenization_spaces=True)
     else:
         model = f'Salesforce/{cfg.MUTATION}'
-        print('xx')
+        print(f'Generate model with input prompt: {prompt}')
         # model = "/mnt/lustre/users/mnasir/NAS-LLM/codegen-6B"
         #model = "/mnt/lustre/users/mnasir/NAS-LLM/diff-codegen-6B"
         #model = os.path.join(cfg.SAVE_DIR, "codegen-6B")
@@ -61,14 +61,24 @@ def codegen_mutate(cfg: Config, prompt, temperature):
         #     # from other sources.
         #     model = f'Salesforce/{cfg.MUTATION}'
 
-        tokenizer = AutoTokenizer.from_pretrained(model)
-        model = AutoModelForCausalLM.from_pretrained(model, torch_dtype=torch.bfloat16, device_map="auto")
+        tokenizer = AutoTokenizer.from_pretrained(model)  # download tokenizer 
+        model = AutoModelForCausalLM.from_pretrained(model, torch_dtype=torch.bfloat16, device_map="auto") # download model 
 
         # TODO: Above lines may have downloaded a fresh model if it was not already present. Now, copy the model file 
         # to the desired location if necessary.
 
-        inputs = tokenizer(prompt, return_tensors="pt").to(cfg.DEVICE)
+        inputs = tokenizer(prompt, return_tensors="pt").to(cfg.DEVICE) # encode prompt
+
+        # generate code 
+        """generate code  
+        input: encoded prompts 
+        max_lenght: maximum length of result (350)
+        temperature: control randomly
+        do_sample: generate sample randomly instead of get best. 
+        """
         sample = model.generate(**inputs, max_length=350 + len(inputs[0]),temperature=temperature,num_beams=1,do_sample=True)
+
+        # decode sample, remove backspace and return generated model architecture. 
         return tokenizer.decode(sample[0][len(inputs[0]):], truncate_before_pattern=[r"\n\n^#", "^'''", "\n\n\n"], clean_up_tokenization_spaces=True)
 
 
