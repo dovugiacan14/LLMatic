@@ -62,8 +62,8 @@ def codegen_mutate(cfg: Config, prompt, temperature):
         #     model = f'Salesforce/{cfg.MUTATION}'
 
         tokenizer = AutoTokenizer.from_pretrained(model)  # download tokenizer 
-        model = AutoModelForCausalLM.from_pretrained(model, torch_dtype=torch.bfloat16, device_map="cuda") # download model 
-
+        model = AutoModelForCausalLM.from_pretrained(model, torch_dtype=torch.bfloat16, device_map="auto") # download model 
+        model.cuda()
         # TODO: Above lines may have downloaded a fresh model if it was not already present. Now, copy the model file 
         # to the desired location if necessary.
 
