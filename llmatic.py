@@ -250,7 +250,7 @@ def main(cfg: Config):
                 with open(f"{network_path}", "w") as f:
                     f.write(code_string)
             # =================== END ======================
-
+            print("======================================= DONE GENERATED ==================================")
         else:  # variation/selection loop
 
             evo_operator = random.choices(
