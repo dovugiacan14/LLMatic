@@ -10,13 +10,14 @@ class Config:
     """This class provides a "schema" for the config file, validating types."""
 
     RANDOM_INIT_NETS: int = 10 # INIT Nets to be accepted in archive
-    INIT_NUM_NETS: int = 2 # INIT Nets created per generation
+    INIT_NUM_NETS: int = 5 # INIT Nets created per generation
     ROLL_OUTS: int = 2 # For GPU training. ROLL_OUTS * (INIT_NUM_NETS or NUM_NETS) = Total nets created in each generation
     NUM_NETS: int = 10 # Mutation and crossover nets to be created
     START_FROM_CHECKPOINT: bool = False
     RANDOM_NETWORKS: bool = False
 
     MUTATION: str = "codegen-6B-mono"
+    #MUTATION: str = "codegen-350M-mono"
     #MUTATION: str = "codex"
 
     GENERATIONS: int = 5
