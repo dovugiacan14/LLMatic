@@ -236,12 +236,15 @@ def main(cfg: Config):
                             prompt=init_net + "\n" + prompt,
                             temperature=temperature_start,
                         )
-                    code_string = textwrap.dedent(code_string)
+                    #code_string = textwrap.dedent(code_string)
+                    print(f"=============================================={type(code_string)}")
                     generated_net_results.append(
                         code_string
                     )
                     with open(f"{network_path}", "w") as f:
                         f.write(code_string)
+                    count += 1
+
 
                 for i, generated_net in enumerate(generated_net_results):
                     generated_nets.append(
