@@ -236,9 +236,12 @@ def main(cfg: Config):
                             prompt=init_net + "\n" + prompt,
                             temperature=temperature_start,
                         )
+                    code_string = textwrap.dedent(code_string)
                     generated_net_results.append(
                         code_string
                     )
+                    with open(f"{network_path}", "w") as f:
+                        f.write(code_string)
 
                 for i, generated_net in enumerate(generated_net_results):
                     generated_nets.append(
@@ -246,12 +249,12 @@ def main(cfg: Config):
                     )
             
             # =================== START ====================
-            for gen_i in range(len(generated_net_results)):
-                network_path = f"generated_nets/netpath_{gen_i}.py"
-                code_string = generated_net_results[gen_i]
-                code_string = textwrap.dedent(code_string)
-                with open(f"{network_path}", "w") as f:
-                    f.write(code_string)
+            # for gen_i in range(len(generated_net_results)):
+            #     network_path = f"generated_nets/netpath_{gen_i}.py"
+            #     code_string = generated_net_results[gen_i]
+            #     code_string = textwrap.dedent(code_string)
+            #     with open(f"{network_path}", "w") as f:
+            #         f.write(code_string)
             # =================== END ======================
             print("======================================= DONE GENERATED ==================================")
         else:  # variation/selection loop
