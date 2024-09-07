@@ -228,28 +228,25 @@ def main(cfg: Config):
                     print(f"Selected prompt for generations: {selected_prompts[i]}")
 
                 # generate code from prompt
-                count= 0
                 for prompt in selected_prompts:
-                    network_path = f"generated_nets/netpath_{count}.py"
-                    code_string = mutation_fn.remote(
+                    generated_net_results.append(
+                        mutation_fn.remote(
                             cfg=cfg,
                             prompt=init_net + "\n" + prompt,
                             temperature=temperature_start,
                         )
-                    #code_string = textwrap.dedent(code_string)
-                    print(f"=============================================={type(code_string)}")
-                    generated_net_results.append(
-                        code_string
                     )
-                    with open(f"{network_path}", "w") as f:
-                        f.write(code_string)
-                    count += 1
 
 
                 for i, generated_net in enumerate(generated_net_results):
-                    generated_nets.append(
-                        (ray.get(generated_net), selected_prompts[i], temperature_start)
-                    )
+                    network_path = f"generated_nets/netpath_{i}.py"
+                    code_string = ray.get(generated_net)
+                    code_string = textwrap.dedent(code_string)
+                    with open(f"{network_path}", "w") as f:
+                        f.write(code_string)
+                    # generated_nets.append(
+                    #     (ray.get(generated_net), selected_prompts[i], temperature_start)
+                    # )
             
             # =================== START ====================
             # for gen_i in range(len(generated_net_results)):
