@@ -150,6 +150,3 @@ You can adjust the environment variables in the .env file. The information inclu
 |  | ```staff_numbers```:  columns need to extract numbers of staff for non-consolidated. |
 |  | ```katakana```:  the hiragana column, which needs to be converted to katakana characters. |
 
-**Example**
-
-![Alt text](assets/create_column_example.png)
