@@ -1,0 +1,5 @@
+test
+_dataset/
+logs/
+**/__pycache__/
+database/
