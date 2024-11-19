@@ -84,7 +84,7 @@ def main():
     network_id = 0 
 
     for generation in range(EAConfig.NUM_GENERATION):
-        while len(networks_metadata) < 5:
+        while len(networks_metadata) < EAConfig.POP_SIZE:
             probabilities = [1.0 / len(PROMPT)] * len(PROMPT)
 
             selected_prompts = random.choices(
