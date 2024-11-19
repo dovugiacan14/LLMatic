@@ -83,7 +83,7 @@ def main():
     networks_metadata = []
     network_id = 0 
 
-    for generation in EAConfig.NUM_GENERATION:
+    for generation in range(EAConfig.NUM_GENERATION):
         while len(networks_metadata) < 5:
             probabilities = [1.0 / len(PROMPT)] * len(PROMPT)
 
@@ -109,68 +109,71 @@ def main():
                 )
 
                 if network_data: 
-                    networks_metadata.append(network_path)
+                    networks_metadata.append(network_data)
                 network_id += 1 
 
-    # Crossover / Mutation 
-    ranked_networks = ranking_individuals_in_pop(networks_metadata)
-    evo_operator = random.choices(["mutation", "crossover"], weights= [0.85, 0.15])[0]
+        # Crossover / Mutation 
+        ranked_networks = ranking_individuals_in_pop(networks_metadata)
+        evo_operator = random.choices(["mutation", "crossover"], weights= [0.85, 0.15])[0]
+        
+        if evo_operator == "mutation":
+            mutation_prompts =  random.choices(
+                PROMPT, weights=probabilities, k=EAConfig.NUM_NET_MUTATION
+            )
+            for prompt in mutation_prompts: 
+                network_id += 1 
+                individual_mutations = select_individuals_mutation(ranked_networks)
+                
+                config_mutation = BaseConfig(
+                    model_name= MODEL_SUFFIX, 
+                    num_offspring= 1, 
+                    temperature= 0.7
+                )
 
-    if evo_operator == "mutation":
-        mutation_prompts =  random.choices(
-            PROMPT, weights=probabilities, k=EAConfig.NUM_NET_MUTATION
-        )
-        for prompt in mutation_prompts: 
+                mutation = Mutation(config_mutation)
+                mutated_offspring = mutation._act(
+                    code_path= individual_mutations.get("path"),
+                    prompt= prompt 
+                )[0]
+
+                network_path = os.path.join(database_net_path, f"network_{network_id}.py")
+                network_data = validate_and_check_network(
+                    generated_code= mutated_offspring, 
+                    path= network_path, 
+                    prompt= prompt, 
+                    device= DEVICE
+                )
+                if network_data: 
+                    networks_metadata.append(network_data)
+
+
+        elif evo_operator == "crossover":
             network_id += 1 
-            individual_mutations = select_individuals_mutation(ranked_networks)
-            
-            config_mutation = BaseConfig(
+
+            config_crossover = BaseConfig(
                 model_name= MODEL_SUFFIX, 
                 num_offspring= 1, 
                 temperature= 0.7
-            )
+            )  
 
-            mutation = Mutation(config_mutation)
-            mutated_offspring = mutation._act(
-                code_path= individual_mutations.get("path"),
-                prompt= prompt 
-            )
-
+            crossover = Crossover(config_crossover)
+            crossover_offsping = crossover._act(
+                parent1_path= ranked_networks[0].get("path"),
+                parent2_path= ranked_networks[1].get("path")
+            )[0]
             network_path = os.path.join(database_net_path, f"network_{network_id}.py")
             network_data = validate_and_check_network(
-                generated_code= mutated_offspring, 
+                generated_code= crossover_offsping, 
                 path= network_path, 
-                prompt= prompt, 
+                prompt= "crossover_prompt",
                 device= DEVICE
             )
+            
             if network_data: 
                 networks_metadata.append(network_data)
-    
 
-    elif evo_operator == "crossover":
-        network_id += 1 
-
-        config_crossover = BaseConfig(
-            model_name= MODEL_SUFFIX, 
-            num_offspring= 1, 
-            temperature= 0.7
-        )  
-
-        crossover = Crossover(config_crossover)
-        crossover_offsping = crossover._act(
-            parent1_path= ranked_networks[0],
-            parent2_path= ranked_networks[1]
-        )
-        network_path = os.path.join(database_net_path, f"network_{network_id}.py")
-        network_data = validate_and_check_network(
-            generated_code= crossover_offsping, 
-            path= network_path, 
-            prompt= "crossover_prompt",
-            device= DEVICE
-        )
-
-        if network_data: 
-            networks_metadata.append(network_data)
+        # selection
+        print(f"Generation {generation} created {len(networks_metadata)} individuals.")
 
     return networks_metadata
 

@@ -15,8 +15,8 @@ class Crossover(BaseGenerator):
     CROSSOVER_PROMPT = """
     Combine the above two neural networks and create a third neural network class that also inherits from nn.Module
     """
-    def __init__(self, model_name: str, num_offspring: int, temperature: float= 0.7):
-        super().__init__(model_name, num_offspring, temperature)
+    # def __init__(self, model_name: str, num_offspring: int, temperature: float= 0.7):
+    #     super().__init__(model_name, num_offspring, temperature)
 
     def _get_crossover_prompt(self, parent1_code: str, parent2_code: str) -> str: 
         """

@@ -19,7 +19,7 @@ class CodeGenerator:
             CodeGenerator._model = AutoModelForCausalLM.from_pretrained(
                 self.model_path, torch_dtype=torch.float16, device_map="auto"
             )
-            return CodeGenerator._tokenizer, CodeGenerator._model
+        return CodeGenerator._tokenizer, CodeGenerator._model
 
     def inference(self, prompt, temperature, tokenizer, llm_model):
         """

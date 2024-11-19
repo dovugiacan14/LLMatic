@@ -1,5 +1,6 @@
 class EAConfig: 
     NUM_GENERATION = 5 
+    POP_SIZE = 5
     NUM_NET_PER_GENERATION = 5
     NUM_NET_MUTATION = 10 
     NUM_NET_CROSSOVER = 2 
