@@ -1,0 +1,9 @@
+1. Run Training-Free with "Zico" or "Meco".
+2. Estimate xem lúc load and inference LLM thì tốn tầm bao nhiêu GPU. 
+3. Thêm cái Selection vào.
+4. Thêm phần điều chỉnh tham số args. 
+
+Optional: 
+1. Dùng Synflow hay Zico. 
+2. Đánh giá Synflow một lần hay lấy trung bình 5 lần. 
+3. Tạo đột biến ngẫu nhiên với 10 câu prompt khác nhau hay 1 câu 10 lần.
