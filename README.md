@@ -44,6 +44,48 @@ To setup environment and install the project dependencies run:
    ```bash
    pip install -r requirements.txt
    ```
+ ## Command Line Arguments
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left;">Argument Command</th>
+      <th style="text-align: left;">Type</th>
+      <th style="text-align: left;">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left;"><strong>--num_generation</strong></td>
+      <td style="text-align: left;">int</td>
+      <td style="text-align: left;">Number of generations</td>
+    </tr>
+    <tr>
+      <td style="text-align: left;"><strong>--pop_size</strong></td>
+      <td style="text-align: left;">int</td>
+      <td style="text-align: left;">The minimum number of individuals required for the initial generation.</td>
+    </tr>
+    <tr>
+      <td style="text-align: left;"><strong>--max_pop_size</strong></td>
+      <td style="text-align: left;">int</td>
+      <td style="text-align: left;">The maximum individuals in population.</td>
+    </tr>
+    <tr>
+      <td style="text-align: left;"><strong>--num_net</strong></td>
+      <td style="text-align: left;">int</td>
+      <td style="text-align: left;">Number of networks generated per generation.</td>
+    </tr>
+    <tr>
+      <td style="text-align: left;"><strong>--num_mutate</strong></td>
+      <td style="text-align: left;">int</td>
+      <td style="text-align: left;">Number of networks to mutate.</td>
+    </tr>
+    <tr>
+      <td style="text-align: left;"><strong>--num_crossover</strong></td>
+      <td style="text-align: left;">int</td>
+      <td style="text-align: left;">Number of networks to crossover.</td>
+    </tr>
+  </tbody>
+</table>
 
 ## Usage
 
@@ -61,5 +103,8 @@ You can adjust the environment variables in the .env file. The information inclu
 - **MODEL_SUFFIX**: The suffix of Saleforces model path.
 
 - **MAX_LENGTH**: 
+
+
+
 
 

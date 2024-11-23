@@ -2,9 +2,11 @@ import os
 import sys
 import random
 import logging
+import argparse
 import numpy as np
 from config.prompts import PROMPT
 from config.evolutionary import EAConfig
+from operators.selection import elitism_selection
 from operators.mutation import Mutation 
 from operators.crossover import Crossover
 from operators.base_operator import BaseConfig 
@@ -75,7 +77,18 @@ def validate_and_check_network(generated_code, path, prompt, device):
         os.remove(path)
         return None 
 
-def main():
+def parse_arguments():
+    parser = argparse.ArgumentParser(description= "Evolutionary Algorithm Configuration.")
+    parser.add_argument("--num_generation", type= int, default= 5, help= "Number of generations")
+    parser.add_argument("--pop_size", type= int, default= 5, help= "The minimum number of individuals required for the initial generation.")
+    parser.add_argument("--max_pop_size", type= int, default= 3, help= "The maximum individuals in population.")
+    parser.add_argument("--num_net", type= int, default= 10, help= "Number of network is generated per generation.")
+    parser.add_argument("--num_mutate", type= int, default= 10, help= "'Number of networks to mutate.")
+    parser.add_argument("--num_crossover", type= int, default= 10, help= "Number of networks to crossover.")
+    
+    return parser.parse_args()
+
+def main(args):
     model_path = f"Salesforce/{MODEL_SUFFIX}"
     codegen = CodeGenerator(model_path)
     tokenizer, model = codegen.load_llm()
@@ -83,12 +96,12 @@ def main():
     networks_metadata = []
     network_id = 0 
 
-    for generation in range(EAConfig.NUM_GENERATION):
-        while len(networks_metadata) < EAConfig.POP_SIZE:
+    for generation in range(args.num_generation):
+        while len(networks_metadata) < args.pop_size:
             probabilities = [1.0 / len(PROMPT)] * len(PROMPT)
 
             selected_prompts = random.choices(
-                PROMPT, weights= probabilities, k= EAConfig.NUM_NET_PER_GENERATION
+                PROMPT, weights= probabilities, k= args.num_net
             ) 
             init_net = read_python_file(INIT_NET_PATH)
             for prompt in selected_prompts:
@@ -112,17 +125,19 @@ def main():
                     networks_metadata.append(network_data)
                 network_id += 1 
 
+        # Selection
+        selected_networks = elitism_selection(networks_metadata, args.max_pop_size)
+
         # Crossover / Mutation 
-        ranked_networks = ranking_individuals_in_pop(networks_metadata)
         evo_operator = random.choices(["mutation", "crossover"], weights= [0.85, 0.15])[0]
         
         if evo_operator == "mutation":
             mutation_prompts =  random.choices(
-                PROMPT, weights=probabilities, k=EAConfig.NUM_NET_MUTATION
+                PROMPT, weights=probabilities, k=args.num_mutate
             )
             for prompt in mutation_prompts: 
                 network_id += 1 
-                individual_mutations = select_individuals_mutation(ranked_networks)
+                individual_mutations = select_individuals_mutation(selected_networks)
                 
                 config_mutation = BaseConfig(
                     model_name= MODEL_SUFFIX, 
@@ -158,8 +173,8 @@ def main():
 
             crossover = Crossover(config_crossover)
             crossover_offsping = crossover._act(
-                parent1_path= ranked_networks[0].get("path"),
-                parent2_path= ranked_networks[1].get("path")
+                parent1_path= selected_networks[0].get("path"),
+                parent2_path= selected_networks[1].get("path")
             )[0]
             network_path = os.path.join(database_net_path, f"network_{network_id}.py")
             network_data = validate_and_check_network(
@@ -171,8 +186,7 @@ def main():
             
             if network_data: 
                 networks_metadata.append(network_data)
-
-        # selection
+ 
         print(f"Generation {generation} created {len(networks_metadata)} individuals.")
 
     return networks_metadata
@@ -191,4 +205,6 @@ if __name__== "__main__":
             logging.StreamHandler(stream= sys.stdout)  
         ], 
     )
-    result = main()
+
+    args = parse_arguments()
+    result = main(args)
