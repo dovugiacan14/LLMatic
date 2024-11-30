@@ -81,7 +81,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description= "Evolutionary Algorithm Configuration.")
     parser.add_argument("--num_generation", type= int, default= 5, help= "Number of generations")
     parser.add_argument("--pop_size", type= int, default= 5, help= "The minimum number of individuals required for the initial generation.")
-    parser.add_argument("--max_pop_size", type= int, default= 3, help= "The maximum individuals in population.")
+    parser.add_argument("--max_pop_size", type= int, default= 5, help= "The maximum individuals in population.")
     parser.add_argument("--num_net", type= int, default= 10, help= "Number of network is generated per generation.")
     parser.add_argument("--num_mutate", type= int, default= 10, help= "'Number of networks to mutate.")
     parser.add_argument("--num_crossover", type= int, default= 10, help= "Number of networks to crossover.")

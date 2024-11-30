@@ -1,7 +1,7 @@
 import os
 import torch
 from config import *
-from transformers import AutoTokenizer, AutoModelForCausalLM, CodeGenForCausalLM
+from transformers import AutoTokenizer, AutoModelForCausalLM, CodeGenForCausalLM, BitsAndBytesConfig
 
 MAX_LENGTH = int(os.environ.get("MAX_LENGTH", 500))
 
@@ -15,9 +15,19 @@ class CodeGenerator:
 
     def load_llm(self):
         if CodeGenerator._tokenizer is None or CodeGenerator._model is None:
+            quantization_config = BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_use_double_quant=True,
+                bnb_4bit_quant_type="nf4",
+                bnb_4bit_compute_dtype=torch.bfloat16
+            )
             CodeGenerator._tokenizer = AutoTokenizer.from_pretrained(self.model_path)
             CodeGenerator._model = AutoModelForCausalLM.from_pretrained(
-                self.model_path, torch_dtype=torch.float16, device_map="auto"
+                self.model_path, 
+                torch_dtype=torch.float16, 
+                load_in_4bit= True, 
+                # quantization_config = quantization_config
+                device_map="auto"
             )
         return CodeGenerator._tokenizer, CodeGenerator._model
 
