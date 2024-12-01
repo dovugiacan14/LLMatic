@@ -49,7 +49,7 @@ def elitism_selection(population, max_pop_size):
         ind_path = ind.get("path")
         if ind_path and os.path.exists(ind_path):
             try:
-                os.path(ind_path)
+                os.remove(ind_path)
             except Exception as e:
                 logging.error(f"Failed to remove {ind_path}: {e}")
         else:
