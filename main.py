@@ -60,13 +60,16 @@ def validate_and_check_network(generated_code, path, prompt, device):
             num_workers= 2, 
             resize= None 
         )
-
-        score = predictive.find_measures(
-            net_orig= net, 
-            dataloader= train_loader, 
-            dataload_info= ("random", 1, 10),
-            device= device
-        )
+        try: 
+            score = predictive.find_measures(
+                net_orig= net, 
+                dataloader= train_loader, 
+                dataload_info= ("random", 1, 10),
+                device= device
+            )
+        except Exception: 
+            score = 0 
+            
         return {
             "net": net, 
             "prompt": prompt, 
