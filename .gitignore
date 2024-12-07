@@ -5,3 +5,5 @@ logs/
 database/
 database_old/
 note
+data/
+train/
