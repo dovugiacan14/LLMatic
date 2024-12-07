@@ -157,6 +157,10 @@ def is_trainable(net):
         if outputs.shape[0] != labels.shape[0]:
             print(f"Output batch size mismatch: expected {labels.shape[0]}, got {outputs.shape[0]}")
             return False
+        
+        if outputs.shape[-1] != 10:
+            print(f"Output shape mismatch: expected last dimension 10, got {outputs.shape[-1]}")
+            return False
         return True 
     
     except Exception as e: 
