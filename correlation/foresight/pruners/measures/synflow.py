@@ -48,7 +48,7 @@ def compute_synflow_per_weight(net, inputs, targets, mode, split_data=1, loss_fn
     net.zero_grad()
     net.double()
     input_dim = list(inputs[0,:].shape)
-    inputs = torch.ones([1] + input_dim).double().to(device)
+    inputs = torch.ones([2] + input_dim).double().to(device)
     output = net.forward(inputs)
     torch.sum(output).backward() 
 

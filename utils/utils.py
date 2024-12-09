@@ -1,16 +1,8 @@
 import os
-import random
 import inspect
 import logging
 import textwrap
 import importlib.util as importutil
-from typing import List, Dict
-
-import torch
-import torchvision
-import torch.utils
-import torch.utils.data
-import torchvision.transforms as transforms
 
 import_command = """
 import torch
@@ -18,22 +10,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 """
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
-
-# prepare dataset 
-transform = transforms.Compose(
-    [
-        transforms.ToTensor(),
-        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-    ]
-)
-trainset = torchvision.datasets.CIFAR10(
-    root= "./data", train= True, download= True, transform= transform
-)
-
-trainloader = torch.utils.data.DataLoader(
-    trainset, batch_size= 64, shuffle= True 
-)
 
 def read_python_file(file_path):
     try:
@@ -132,52 +108,3 @@ def create_instance(cls, *args, **kwargs):
         else:
             raise TypeError(f"Missing required argument: '{name}'")
     return cls(**init_args)
-
-
-# def is_trainable(net):
-#     zeros = torch.zeros(1, 3, 32, 32)
-
-#     try:
-#         output = net(zeros)
-#     except Exception as e:
-#         print(f"Falied to pass dummy input through the network: {e}")
-#         return False
-
-#     if output.shape[-1] != 10:
-#         print(f"Output shape mismatch: expected (1, 10), got {output.shape}")
-#         return False
-def is_trainable(net):
-    try: 
-        net.to(device)
-
-        inputs, labels = next(iter(trainloader))
-        inputs, labels = inputs.to(device), labels.to(device)
-
-        outputs = net(inputs)
-        if outputs.shape[0] != labels.shape[0]:
-            print(f"Output batch size mismatch: expected {labels.shape[0]}, got {outputs.shape[0]}")
-            return False
-        
-        if outputs.shape[-1] != 10:
-            print(f"Output shape mismatch: expected last dimension 10, got {outputs.shape[-1]}")
-            return False
-        return True 
-    
-    except Exception as e: 
-        print(f"Error occurred when checking trainable: {e}")
-        return False 
-
-
-def ranking_individuals_in_pop(pop: List[Dict]):
-    return sorted(pop, key=lambda x: x["score"], reverse=True)
-
-
-def select_individuals_mutation(pop: List[Dict]):
-    n_pop = len(pop)
-    if n_pop > 2:
-        weights = [0.5, 0.2] + [0.5 / (n_pop - 2)] * (n_pop - 2)
-    else:
-        weights = [0, 5, 0.2][:n_pop]
-
-    random_inviduals = random.choices(pop, weights=weights, k=1)[0]
-    return random_inviduals

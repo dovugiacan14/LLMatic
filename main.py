@@ -5,7 +5,6 @@ import logging
 import argparse
 import numpy as np
 from config.prompts import PROMPT
-from config.evolutionary import EAConfig
 from operators.selection import elitism_selection
 from operators.mutation import Mutation 
 from operators.crossover import Crossover
@@ -15,6 +14,8 @@ from correlation.foresight.pruners import predictive
 from correlation.foresight.dataset import get_cifar_dataloaders
 from config import *
 from utils.utils import *
+from utils.network_validation import is_trainable
+from utils.population_utils import select_individuals_mutation
 
 
 database_net_path = "./database"
@@ -69,7 +70,7 @@ def validate_and_check_network(generated_code, path, prompt, device):
             )
         except Exception: 
             score = 0 
-            
+
         return {
             "net": net, 
             "prompt": prompt, 
