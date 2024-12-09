@@ -61,21 +61,18 @@ def validate_and_check_network(generated_code, path, prompt, device):
             num_workers= 2, 
             resize= None 
         )
-        try: 
-            score = predictive.find_measures(
-                net_orig= net, 
-                dataloader= train_loader, 
-                dataload_info= ("random", 1, 10),
-                device= device
-            )
-        except Exception: 
-            score = 0 
+        score = predictive.find_measures(
+            net_orig= net, 
+            dataloader= train_loader, 
+            dataload_info= ("random", 1, 10),
+            device= device
+        )
 
         return {
             "net": net, 
             "prompt": prompt, 
             "path": path, 
-            "score": score["synflow"]
+            "score": score.get("synflow", 0)
         }
     else: 
         os.remove(path)
