@@ -54,7 +54,7 @@ def compute_synflow_per_weight(net, inputs, targets, mode, split_data=1, loss_fn
         torch.sum(output).backward() 
     except Exception as e: 
         print(f"Error when gradient computation synflow: {e}")
-        return None 
+        return {} 
 
     # select the gradients that we want to use for search/prune
     def synflow(layer):
