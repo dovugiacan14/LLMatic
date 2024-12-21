@@ -65,7 +65,7 @@ def write_codestring_to_file(code_string: str, output_file_name: str):
     """
     # remove any common leading whitespace from code_string
     code_string = textwrap.dedent(code_string)
-    with open(f"{output_file_name}", "w") as f:
+    with open(f"{output_file_name}", "w", encoding= 'utf-8') as f:
         f.write(code_string)
 
 

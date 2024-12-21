@@ -1,5 +1,6 @@
 import os 
 import sys
+import json
 import torch 
 import random
 import logging 
@@ -52,8 +53,8 @@ def parse_arguments():
     parser.add_argument("--num_net", type= int, default= 10, help= "Number of network is generated per generation.")
     parser.add_argument("--num_mutate", type= int, default= 10, help= "'Number of networks to mutate.")
     parser.add_argument("--num_crossover", type= int, default= 10, help= "Number of networks to crossover.")
-    parser.add_argument("--random_init_net", type= int, default= 10)
-    parser.add_argument("--roll_out", type= int, default= 4, help= "For GPU training. ROLL_OUTS * (INIT_NUM_NETS or NUM_NETS) = Total nets created in each generation")
+    parser.add_argument("--random_init_net", type= int, default= 3)
+    parser.add_argument("--roll_out", type= int, default= 1, help= "For GPU training. ROLL_OUTS * (INIT_NUM_NETS or NUM_NETS) = Total nets created in each generation")
     parser.add_argument("--temperature_start", type= int, default= 0.7)
     parser.add_argument("--n_niches", type= int, default= 100, help= "Number of niches for map elites.")
     parser.add_argument("--save_dir", type= str, default= './')
@@ -105,7 +106,7 @@ def main(args):
 
     prev_best_score = -np.inf
     exp_name = f"gen-nets_{MODEL_SUFFIX}_networks-{args.num_net}_niches-{args.n_niches}_infer-and-flops-as-bd"
-    path_nets = f"{args.SAVE_DIR}/logs/{exp_name}"
+    path_nets = f"{args.save_dir}/logs/{exp_name}"
     os.makedirs(path_nets, exist_ok=True)
     log_file = open(os.path.normpath(f"{path_nets}/cvt.dat"), "w")
     out_file = os.path.normpath(f"{path_nets}/exp_results.csv")
@@ -260,7 +261,7 @@ def main(args):
             if not code_string: 
                 code_string = " "
             write_codestring_to_file(code_string, net_path)
-            main_net_focus = read_python_file(net_path)
+            # main_net_focus = read_python_file(net_path)
             
             try: 
                 Net = get_class(net_path)
@@ -269,12 +270,6 @@ def main(args):
             except Exception:
                 print(f"The network at {net_path} is invalid.")
                 continue
-                # Net = get_class(init_net)
-                # net_path = INIT_NET_PATH
-                # if isinstance(curios_prompt, str):
-                #     prompt = curios_prompt
-                # elif isinstance(curios_prompt, float) or isinstance(curios_prompt, int):
-                #     prompt = int_to_prompt[int(curios_prompt)]
 
             if is_trainable(net):
                 net_paths.append(net_path)
@@ -287,8 +282,7 @@ def main(args):
         if training_nets == []:
             continue 
         
-        # Step 3: calculate fitness based on synflow score 
-        # if len(net_archive.keys()) < args.random_init_net and len(prompt_archive.keys()) < args.random_init_net * 2:
+        # Step 3: calculate fitness based on synflow score
         inter_results = []
         fitness = []
         for net in training_nets:
@@ -373,9 +367,9 @@ def main(args):
                 type_ind= "prompt"
             )
             if not net_added:
-                s_prompt.curiosity = s_prompt - 0.5 
+                s_prompt.curiosity = s_prompt.curiosity - 0.5 
             elif net_added: 
-                s_prompt.curiosity = s_prompt + 1.0 
+                s_prompt.curiosity = s_prompt.curiosity  + 1.0 
         if gen_i % i == 0:
             cm.__save_archieve(net_archive, gen_i, name= "net")
             cm.__save_archieve(prompt_archive, gen_i, name= "prompt")
@@ -414,4 +408,6 @@ if __name__== "__main__":
     )
 
     args = parse_arguments()
-    result = main(args)
+    net_archive_result, prompt_archive_result = main(args)
+    with open("net_archive.json", "w", encoding="utf-8") as f:
+        json.dump(net_archive_result, f, indent=4, ensure_ascii=False)
