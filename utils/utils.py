@@ -1,7 +1,9 @@
 import os
+import csv
 import inspect
 import logging
 import textwrap
+import torch.nn as nn
 import importlib.util as importutil
 
 import_command = """
@@ -63,7 +65,7 @@ def write_codestring_to_file(code_string: str, output_file_name: str):
     """
     # remove any common leading whitespace from code_string
     code_string = textwrap.dedent(code_string)
-    with open(f"{output_file_name}", "w") as f:
+    with open(f"{output_file_name}", "w", encoding= 'utf-8') as f:
         f.write(code_string)
 
 
@@ -108,3 +110,51 @@ def create_instance(cls, *args, **kwargs):
         else:
             raise TypeError(f"Missing required argument: '{name}'")
     return cls(**init_args)
+
+def get_max_fitness(species_list, n):
+    species_list_sorted = sorted(species_list, key= lambda x: x.fitness, reverse= False)
+    return species_list_sorted[:n]
+
+def get_max_curiosity(species_list, n):
+    species_list_sorted = sorted(species_list, key=lambda x: x.curiosity, reverse=True)
+    return species_list_sorted[:n]
+
+def get_network_width_depth_ratio(net):
+    depth = 0
+    width = []
+    for _, module in net.named_modules():
+        if isinstance(module, (nn.Conv1d, nn.Conv2d, nn.Conv3d,
+                               nn.ConvTranspose1d, nn.ConvTranspose2d, nn.ConvTranspose3d,
+                               nn.BatchNorm1d, nn.BatchNorm2d, nn.BatchNorm3d,
+                               nn.InstanceNorm1d, nn.InstanceNorm2d, nn.InstanceNorm3d,
+                               nn.LocalResponseNorm,
+                               nn.Linear, nn.Bilinear,
+                               nn.Dropout, nn.Dropout2d, nn.Dropout3d,
+                               nn.Embedding, nn.EmbeddingBag,
+                               nn.LSTM, nn.GRU, nn.RNN,
+                               nn.PReLU, nn.ReLU, nn.ReLU6, nn.RReLU,
+                               nn.SELU, nn.CELU, nn.ELU, nn.GELU, nn.SiLU,
+                               nn.Sigmoid, nn.Tanh, nn.LogSigmoid, nn.Softplus, nn.Softshrink,
+                               nn.Softsign, nn.Tanhshrink, nn.Threshold,
+                               nn.AdaptiveAvgPool1d, nn.AdaptiveAvgPool2d, nn.AdaptiveAvgPool3d,
+                               nn.AdaptiveLogSoftmaxWithLoss, nn.AdaptiveMaxPool1d, nn.AdaptiveMaxPool2d,
+                               nn.AdaptiveMaxPool3d, nn.AvgPool1d, nn.AvgPool2d, nn.AvgPool3d,
+                               nn.FractionalMaxPool2d, nn.MaxPool1d, nn.MaxPool2d, nn.MaxPool3d,
+                               nn.LPPool1d, nn.LPPool2d, nn.LocalResponseNorm, nn.Softmax, nn.Softmin,
+                               nn.LogSoftmax, nn.Threshold)):
+            depth += 1
+            #if hasattr(module, 'out_features'):
+            if isinstance(module,nn.Conv2d):
+                width.append(module.out_channels)
+            elif hasattr(module, 'out_features'):
+                width.append(module.out_features)
+    ratio = max(width)/depth
+    print(width)
+    print(depth)
+    return ratio
+
+def csv_writer(results, output_file):
+
+    with open(output_file, 'a', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(results)
