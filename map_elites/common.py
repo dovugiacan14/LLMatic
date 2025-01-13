@@ -1,3 +1,4 @@
+import os
 import math
 import numpy as np
 from pathlib import Path
@@ -19,8 +20,10 @@ default_params = {
     "line_sigma": 0.02
 }
 
-def __centroids_filename(k, dim):
-    return "centroids_" + str(k) + "_" + str(dim) + ".dat"
+def __centroids_filename(k, dim, folder= "archive"):
+    os.makedirs(folder, exist_ok= True)
+    fname = f"centroids_{k}_{dim}.dat"
+    return os.path.join(folder, fname)
 
 def __write_centroids(centroids):
     k = centroids.shape[0]
@@ -28,9 +31,7 @@ def __write_centroids(centroids):
     filename = __centroids_filename(k, dim)
     with open(filename, 'w') as f: 
         for p in centroids:
-            for item in p: 
-                f.write(str(item) + " ")
-            f.write("\n")
+            f.write(" ".join(map(str, p)) + "\n")
 
 def cvt(k, dim, samples, cvt_use_cache= True):
     fname = __centroids_filename(k, dim)
@@ -49,12 +50,14 @@ def cvt(k, dim, samples, cvt_use_cache= True):
 def make_hashable(array):
     return tuple(map(float, array))
 
-def __save_archieve(archive, gen, name= "net"):
+def save_archieve(archive, gen, name= "net", folder= "archive"):
     def write_array(a, f):
         for i in a: 
             f.write(str(i) + " ")
-    filename = name + "archive_" + str(gen) + '.dat'
+    filename = os.path.join(folder, f"{name}archive_{gen}.dat")
+    headers = ["Net_Path", "Fitness_score", "Centroid_dim_1", "Centroid_dim_2", "Curiosity", "Depth width Ratio", "Flops"]
     with open(filename, 'w') as f: 
+        f.write(" ".join(headers) + "\n") 
         for k in archive.values():
             f.write(k.net_path + " ")
             f.write(str(k.fitness) + ' ')
