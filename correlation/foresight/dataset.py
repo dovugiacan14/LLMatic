@@ -24,7 +24,7 @@ import torch
 from .imagenet16 import *
 
 
-def get_cifar_dataloaders(train_batch_size, test_batch_size, dataset, num_workers, resize=None, datadir='_dataset'):
+def get_cifar_dataloaders(train_batch_size, test_batch_size, dataset, num_workers, resize=None, datadir='data'):
     # print(dataset)
     if 'ImageNet16' in dataset:
         mean = [x / 255 for x in [122.68, 116.66, 104.01]]
