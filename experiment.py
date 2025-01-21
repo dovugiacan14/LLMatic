@@ -10,7 +10,8 @@ from config.prompts import PROMPT
 from map_elites import common as cm
 from sklearn.neighbors import KDTree
 from fvcore.nn import FlopCountAnalysis
-from generators.codegen import CodeGenerator
+# from generators.codegen import CodeGenerator
+from generators.qwen import CodeGenerator
 from utils.network_validation import is_trainable
 from correlation.foresight.pruners import predictive
 from correlation.foresight.dataset import get_cifar_dataloaders
@@ -184,8 +185,12 @@ class ArchiveManager:
 
 def main(args): 
     # initialize components 
+    # generator = NetworkGenerator(
+    #     model_path= f"Salesforce/{MODEL_SUFFIX}",
+    #     init_net_path= INIT_NET_PATH
+    # )
     generator = NetworkGenerator(
-        model_path= f"Salesforce/{MODEL_SUFFIX}",
+        model_path= "Qwen/Qwen2.5-Coder-7B",
         init_net_path= INIT_NET_PATH
     )
     evaluator = NetworkEvaluator(train_loader, DEVICE)
