@@ -10,7 +10,8 @@ from config.prompts import PROMPT
 from map_elites import common as cm
 from sklearn.neighbors import KDTree
 from fvcore.nn import FlopCountAnalysis
-from generators.codegen import CodeGenerator
+# from generators.codegen import CodeGenerator
+from generators.qwen import CodeGenerator
 from utils.network_validation import is_trainable
 from correlation.foresight.pruners import predictive
 from correlation.foresight.dataset import get_cifar_dataloaders
@@ -36,10 +37,10 @@ for i, prompt in enumerate(PROMPT):
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description= "Evolutionary Algorithm Configuration.")
-    parser.add_argument("--num_generation", type= int, default= 2, help= "Number of generations")
+    parser.add_argument("--num_generation", type= int, default= 10, help= "Number of generations")
     parser.add_argument("--pop_size", type= int, default= 5, help= "The minimum number of individuals required for the initial generation.")
     parser.add_argument("--max_pop_size", type= int, default= 5, help= "The maximum individuals in population.")
-    parser.add_argument("--num_net", type= int, default= 2, help= "Number of network is generated per generation.")
+    parser.add_argument("--num_net", type= int, default= 5, help= "Number of network is generated per generation.")
     parser.add_argument("--num_mutate", type= int, default= 10, help= "'Number of networks to mutate.")
     parser.add_argument("--num_crossover", type= int, default= 10, help= "Number of networks to crossover.")
     parser.add_argument("--random_init_net", type= int, default= 3)
@@ -184,8 +185,12 @@ class ArchiveManager:
 
 def main(args): 
     # initialize components 
+    # generator = NetworkGenerator(
+    #     model_path= f"Salesforce/{MODEL_SUFFIX}",
+    #     init_net_path= INIT_NET_PATH
+    # )
     generator = NetworkGenerator(
-        model_path= f"Salesforce/{MODEL_SUFFIX}",
+        model_path= "Qwen/Qwen2.5-Coder-7B",
         init_net_path= INIT_NET_PATH
     )
     evaluator = NetworkEvaluator(train_loader, DEVICE)
